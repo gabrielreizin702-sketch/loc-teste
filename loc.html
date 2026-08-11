@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Localização do Usuário</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #locationData {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📍 Obter Localização</h1>
+        <p>Clique no botão abaixo para compartilhar sua localização.</p>
+        <button onclick="getLocation()">Obter Localização</button>
+        <div id="locationData"></div>
+    </div>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    showPosition,
+                    showError,
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                document.getElementById("locationData").innerHTML =
+                    "<p>Geolocalização não é suportada por este navegador.</p>";
+                document.getElementById("locationData").style.display = "block";
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            const locationData = `
+                <h3>📍 Localização Obtida</h3>
+                <p><strong>Latitude:</strong> ${lat}</p>
+                <p><strong>Longitude:</strong> ${lng}</p>
+                <p><strong>Precisão:</strong> ${accuracy.toFixed(2)} metros</p>
+                <p><strong>Data/Hora:</strong> ${new Date().toLocaleString()}</p>
+                <p>Os dados foram salvos em <code>localizacao.txt</code>.</p>
+            `;
+
+            document.getElementById("locationData").innerHTML = locationData;
+            document.getElementById("locationData").style.display = "block";
+
+            // Salvar em arquivo (funciona apenas em navegadores modernos)
+            saveToFile(lat, lng, accuracy);
+        }
+
+        function showError(error) {
+            let errorMessage = "";
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = "Usuário negou a solicitação de geolocalização.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = "Localização indisponível.";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = "Tempo limite excedido.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorMessage = "Erro desconhecido.";
+                    break;
+            }
+            document.getElementById("locationData").innerHTML =
+                `<p>Erro: ${errorMessage}</p>`;
+            document.getElementById("locationData").style.display = "block";
+        }
+
+        function saveToFile(lat, lng, accuracy) {
+            const data = `Latitude: ${lat}\nLongitude: ${lng}\nPrecisão: ${accuracy.toFixed(2)} metros\nData: ${new Date().toLocaleString()}\n\n`;
+            const blob = new Blob([data], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "localizacao.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
